@@ -4,8 +4,6 @@ A modern, privacy-focused web application to visualize your TripIt travel histor
 
 **Live Demo**: [https://tripit.csanchez.org](https://tripit.csanchez.org)
 
-![Trip Dashboard Mockup](https://raw.githubusercontent.com/carlossg/tripit-viewer/main/public/dashboard-preview.png) *(Placeholder for preview image)*
-
 ## 🚀 Features
 
 - **🛡️ Privacy First**: All data is processed locally in your browser. No data is ever uploaded to any server.
