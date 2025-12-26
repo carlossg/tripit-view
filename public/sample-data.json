@@ -1,0 +1,155 @@
+{
+    "Trips": [
+        {
+            "TripData": {
+                "id": "sample-trip-1",
+                "display_name": "Summer in Europe",
+                "start_date": "2024-07-10",
+                "end_date": "2024-07-20",
+                "primary_location": "Paris, France",
+                "PrimaryLocationAddress": {
+                    "city": "Paris",
+                    "country": "FR"
+                },
+                "image_url": "https://www.tripit.com/images/places/fr/paris.jpg"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "Air France",
+                            "marketing_airline_code": "AF",
+                            "marketing_flight_number": "123",
+                            "StartDateTime": {
+                                "date": "2024-07-10",
+                                "time": "10:00:00",
+                                "timezone": "Europe/Paris"
+                            },
+                            "EndDateTime": {
+                                "date": "2024-07-10",
+                                "time": "18:00:00",
+                                "timezone": "Europe/Paris"
+                            },
+                            "start_airport_code": "JFK",
+                            "end_airport_code": "CDG",
+                            "duration": "8h 0m",
+                            "distance": "3,635 mi",
+                            "aircraft_display_name": "Boeing 777"
+                        }
+                    ],
+                    "Traveler": [
+                        {
+                            "first_name": "Alice",
+                            "last_name": "Smith"
+                        },
+                        {
+                            "first_name": "Bob",
+                            "last_name": "Smith"
+                        }
+                    ]
+                },
+                {
+                    "display_name": "Hotel Eiffel",
+                    "room_type": "Deluxe Room",
+                    "StartDateTime": {
+                        "date": "2024-07-10",
+                        "time": "15:00:00"
+                    },
+                    "EndDateTime": {
+                        "date": "2024-07-20",
+                        "time": "11:00:00"
+                    },
+                    "Address": {
+                        "address": "123 Rue de Paris",
+                        "city": "Paris"
+                    },
+                    "Guest": [
+                        {
+                            "first_name": "Alice",
+                            "last_name": "Smith"
+                        },
+                        {
+                            "first_name": "Bob",
+                            "last_name": "Smith"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "sample-trip-2",
+                "display_name": "Business Trip to Tokyo",
+                "start_date": "2024-11-05",
+                "end_date": "2024-11-08",
+                "primary_location": "Tokyo, Japan",
+                "PrimaryLocationAddress": {
+                    "city": "Tokyo",
+                    "country": "JP"
+                }
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "Japan Airlines",
+                        "marketing_airline_code": "JL",
+                        "marketing_flight_number": "45",
+                        "StartDateTime": {
+                            "date": "2024-11-05",
+                            "time": "12:00:00"
+                        },
+                        "EndDateTime": {
+                            "date": "2024-11-06",
+                            "time": "16:00:00"
+                        },
+                        "start_airport_code": "LHR",
+                        "end_airport_code": "HND",
+                        "duration": "14h 0m",
+                        "distance": "5,974 mi"
+                    },
+                    "Traveler": {
+                        "first_name": "Alice",
+                        "last_name": "Smith"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "sample-trip-3",
+                "display_name": "Weekend in Tahoe",
+                "start_date": "2025-01-15",
+                "end_date": "2025-01-17",
+                "primary_location": "Lake Tahoe, CA",
+                "PrimaryLocationAddress": {
+                    "city": "South Lake Tahoe",
+                    "country": "US"
+                }
+            },
+            "Objects": [
+                {
+                    "display_name": "Hertz Car Rental",
+                    "supplier_name": "Hertz",
+                    "StartDateTime": {
+                        "date": "2025-01-15",
+                        "time": "09:00:00"
+                    },
+                    "EndDateTime": {
+                        "date": "2025-01-17",
+                        "time": "17:00:00"
+                    },
+                    "Traveler": [
+                        {
+                            "first_name": "Bob",
+                            "last_name": "Smith"
+                        },
+                        {
+                            "first_name": "Charlie",
+                            "last_name": "Jones"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
