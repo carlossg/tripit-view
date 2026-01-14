@@ -114,18 +114,34 @@ const FlightMap = ({ trips }) => {
         const airports = new Map();
         const allCoords = [];
 
-        // Frequency counters
-        const airportCounts = {};
+        // Flatten all flights from all trips and prepare for analysis
+        let allFlights = [];
         const routeCounts = {};
 
         trips.forEach(trip => {
             trip.flights.forEach(flight => {
+                if (!flight.origin || !flight.destination) return;
+
+                // Construct date object for sorting
+                const startDateStr = flight.start?.date || trip.startDate || '1970-01-01';
+                const startTimeStr = flight.start?.time || '00:00:00';
+                const endDateStr = flight.end?.date || flight.start?.date || trip.startDate || '1970-01-01';
+                const endTimeStr = flight.end?.time || '00:00:00';
+
+                const start = new Date(`${startDateStr}T${startTimeStr}`);
+                const end = new Date(`${endDateStr}T${endTimeStr}`);
+
+                allFlights.push({
+                    ...flight,
+                    startTime: start.getTime(),
+                    endTime: end.getTime(),
+                    startObj: start,
+                    endObj: end
+                });
+
+                // Prepare visualization data (paths & coords)
                 const originCoord = airportCoords[flight.origin];
                 const destCoord = airportCoords[flight.destination];
-
-                // Update airport counts
-                airportCounts[flight.origin] = (airportCounts[flight.origin] || 0) + 1;
-                airportCounts[flight.destination] = (airportCounts[flight.destination] || 0) + 1;
 
                 // Update route counts (bidirectional)
                 const routeKey = [flight.origin, flight.destination].sort().join('-');
@@ -149,6 +165,40 @@ const FlightMap = ({ trips }) => {
                     allCoords.push(destCoord);
                 }
             });
+        });
+
+        // Sort flights by time
+        allFlights.sort((a, b) => a.startTime - b.startTime);
+
+        // Calculate Airport Visits (12h Stopover Rule)
+        const airportCounts = {};
+
+        allFlights.forEach((flight, i) => {
+            // ALWAYS count origin
+            airportCounts[flight.origin] = (airportCounts[flight.origin] || 0) + 1;
+
+            // Check destination
+            let countDestination = true;
+            const nextFlight = allFlights[i + 1];
+
+            if (nextFlight) {
+                const isConnection = nextFlight.origin === flight.destination;
+
+                if (isConnection) {
+                    // Check time difference
+                    const diffMs = nextFlight.startTime - flight.endTime;
+                    const diffHours = diffMs / (1000 * 60 * 60);
+
+                    // If connection is < 12h, it's a stopover/transit -> Do NOT count
+                    if (diffHours <= 12 && diffHours >= 0) {
+                        countDestination = false;
+                    }
+                }
+            }
+
+            if (countDestination) {
+                airportCounts[flight.destination] = (airportCounts[flight.destination] || 0) + 1;
+            }
         });
 
         // Identify Top 5 Airports
