@@ -26,6 +26,134 @@ const deepEncodingFix = (obj) => {
     return obj;
 };
 
+const COUNTRY_NAME_TO_ISO = {
+    'france': 'FR',
+    'frans': 'FR',
+    'united kingdom': 'GB',
+    'uk': 'GB',
+    'great britain': 'GB',
+    'united states': 'US',
+    'usa': 'US',
+    'germany': 'DE',
+    'deutschland': 'DE',
+    'spain': 'ES',
+    'españa': 'ES',
+    'italy': 'IT',
+    'italia': 'IT',
+    'brazil': 'BR',
+    'brasil': 'BR',
+    'mexico': 'MX',
+    'méxico': 'MX',
+    'canada': 'CA',
+    'australia': 'AU',
+    'china': 'CN',
+    'japan': 'JP',
+    'india': 'IN',
+    'netherlands': 'NL',
+    'nederland': 'NL',
+    'switzerland': 'CH',
+    'schweiz': 'CH',
+    'suisse': 'CH',
+    'belgium': 'BE',
+    'belgië': 'BE',
+    'belgique': 'BE',
+    'portugal': 'PT',
+    'austria': 'AT',
+    'österreich': 'AT',
+    'sweden': 'SE',
+    'sverige': 'SE',
+    'norway': 'NO',
+    'norge': 'NO',
+    'denmark': 'DK',
+    'danmark': 'DK',
+    'finland': 'FI',
+    'suomi': 'FI',
+    'ireland': 'IE',
+    'éire': 'IE',
+    'argentina': 'AR',
+    'chile': 'CL',
+    'colombia': 'CO',
+    'peru': 'PE',
+    'russia': 'RU',
+    'south africa': 'ZA',
+    'new zealand': 'NZ',
+    'singapore': 'SG',
+    'thailand': 'TH',
+    'united arab emirates': 'AE',
+    'uae': 'AE',
+    'turkey': 'TR',
+    'türkiye': 'TR',
+    'greece': 'GR',
+    'hellas': 'GR',
+    'poland': 'PL',
+    'polska': 'PL',
+    'czech republic': 'CZ',
+    'czechia': 'CZ',
+    'hungary': 'HU',
+    'israel': 'IL',
+    'egypt': 'EG',
+    'morocco': 'MA',
+    // ISO3 to ISO2 fallback
+    'fra': 'FR',
+    'nor': 'NO',
+    'gbr': 'GB',
+    'usa': 'US',
+    'deu': 'DE',
+    'esp': 'ES',
+    'ita': 'IT',
+    'can': 'CA',
+    'aus': 'AU',
+    'jpn': 'JP',
+    'chn': 'CN',
+    'ind': 'IN',
+    'nld': 'NL',
+    'che': 'CH',
+    'bel': 'BE',
+    'prt': 'PT',
+    'aut': 'AT',
+    'swe': 'SE',
+    'dnk': 'DK',
+    'fin': 'FI',
+    'irl': 'IE',
+    'tha': 'TH',
+    'tur': 'TR'
+};
+
+const resolveCountryCode = (val) => {
+    if (!val) return null;
+    let clean = val.trim().toLowerCase();
+
+    // Basic cleaning (e.g. remove "the " from "The Netherlands")
+    if (clean.startsWith('the ')) clean = clean.slice(4);
+
+    // Exact 2-letter ISO code
+    if (clean.length === 2 && /^[a-z]{2}$/i.test(clean)) return clean.toUpperCase();
+
+    // Check direct mapping (full names or ISO3)
+    if (COUNTRY_NAME_TO_ISO[clean]) return COUNTRY_NAME_TO_ISO[clean];
+
+    // Check for 2-letter code at the end (e.g., "Paris, FR" or "London GB")
+    const last2Match = clean.match(/[\s,]([a-z]{2})$/i);
+    if (last2Match) return last2Match[1].toUpperCase();
+
+    // Check if any known country name appears as a word in the string
+    // This handles "Oslo, Norway", "Norway (Europe)", "France - Paris", etc.
+    for (const [name, iso] of Object.entries(COUNTRY_NAME_TO_ISO)) {
+        if (clean.includes(name)) {
+            const index = clean.indexOf(name);
+            // Word boundary check: character before and after should not be a letter
+            const charBefore = index > 0 ? clean[index - 1] : ' ';
+            const charAfter = index + name.length < clean.length ? clean[index + name.length] : ' ';
+
+            if (!/[a-z]/.test(charBefore) && !/[a-z]/.test(charAfter)) {
+                return iso;
+            }
+        }
+    }
+
+    return null;
+};
+
 export const parseTrips = (jsonData) => {
     if (!jsonData || !jsonData.Trips) return [];
 
@@ -177,7 +305,7 @@ export const parseTrips = (jsonData) => {
             image: data.image_url,
             year: startDate ? getYear(startDate) : null,
             days,
-            country: data.PrimaryLocationAddress?.country || data.primary_location?.split(', ').pop(),
+            country: resolveCountryCode(data.PrimaryLocationAddress?.country) || resolveCountryCode(data.primary_location),
             flights,
             travelers,
             timeline
@@ -189,7 +317,7 @@ export const parseTrips = (jsonData) => {
     });
 };
 
-export const calculateStats = (trips) => {
+export const calculateStats = (trips, iataToCountry = {}) => {
     const stats = {
         totalTrips: trips.length,
         totalFlights: 0,
@@ -211,9 +339,21 @@ export const calculateStats = (trips) => {
         if (trip.travelers) {
             trip.travelers.forEach(t => stats.allTravelers.add(t));
         }
+
+        // Add country from trip summary
         if (trip.country) {
-            if (trip.country.length === 2) stats.countriesVisited.add(trip.country);
+            if (trip.country.length === 2) stats.countriesVisited.add(trip.country.toUpperCase());
         }
+
+        // Add countries from hotel/lodging addresses in timeline
+        trip.timeline.forEach(item => {
+            if (item.type === 'lodging') {
+                const country = resolveCountryCode(item.details?.Address?.country || item.address?.country);
+                if (country) {
+                    stats.countriesVisited.add(country);
+                }
+            }
+        });
 
         const start = trip.startDate ? parseISO(trip.startDate) : null;
         const end = trip.endDate ? parseISO(trip.endDate) : null;
@@ -250,6 +390,13 @@ export const calculateStats = (trips) => {
         // Flight Stats (Trips still have their original flight lists)
         trip.flights.forEach(flight => {
             stats.totalFlights += 1;
+
+            // Add countries from airports
+            const originCountry = iataToCountry[flight.origin];
+            const destCountry = iataToCountry[flight.destination];
+            if (originCountry) stats.countriesVisited.add(originCountry.toUpperCase());
+            if (destCountry) stats.countriesVisited.add(destCountry.toUpperCase());
+
             const fYear = flight.start?.date ? getYear(parseISO(flight.start.date)) : startYear;
             const fDate = flight.start?.date ? parseISO(flight.start.date) : null;
             const fMonth = fDate && isValid(fDate) ? fDate.getMonth() + 1 : 'Unknown';

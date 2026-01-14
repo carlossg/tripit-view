@@ -6,6 +6,8 @@ import TripList from './TripList';
 import TripDetail from './TripDetail';
 import AirlineStatsChart from './AirlineStatsChart';
 import FlightMap from './FlightMap';
+import VisitedCountriesMap from './VisitedCountriesMap';
+import CountryListByContinent from './CountryListByContinent';
 
 const SampleDataNotice = () => (
     <div className="card" style={{
@@ -36,11 +38,13 @@ const SampleDataNotice = () => (
     </div>
 );
 
-const Dashboard = ({ stats, trips, allTravelers, selectedTravelers, isSample, onTravelersChange, onDataLoaded }) => {
+const Dashboard = ({ stats, automatedStats, trips, allTravelers, selectedTravelers, manualVisitedCountries, isSample, onTravelersChange, onToggleCountry, onDataLoaded }) => {
     const [selectedTrip, setSelectedTrip] = useState(null);
     const [showAirlineStats, setShowAirlineStats] = useState(false);
     const [showMap, setShowMap] = useState(true);
+    const [mapMode, setMapMode] = useState('countries'); // 'flights' or 'countries' - default to countries
     const [showTravelerFilter, setShowTravelerFilter] = useState(false);
+    const [showCountryList, setShowCountryList] = useState(false);
 
     const handleFileInput = (e) => {
         const file = e.target.files[0];
@@ -59,7 +63,7 @@ const Dashboard = ({ stats, trips, allTravelers, selectedTravelers, isSample, on
         reader.readAsText(file);
     };
 
-    const handleExport = () => {
+    const handleExportCSV = () => {
         const headers = ['DisplayName', 'StartDate', 'EndDate', 'Location', 'Country', 'Year', 'Days', 'FlightsCount', 'Travelers'];
         const rows = trips.map(t => [
             `"${t.displayName}"`,
@@ -79,6 +83,26 @@ const Dashboard = ({ stats, trips, allTravelers, selectedTravelers, isSample, on
         const link = document.createElement('a');
         link.href = url;
         link.setAttribute('download', 'tripit_export.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleExportJSON = (rawData) => {
+        const exportData = {
+            _tripitViewerExport: true,
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            rawData,
+            manualVisitedCountries
+        };
+
+        const jsonContent = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'tripit_viewer_export.json');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -152,11 +176,18 @@ const Dashboard = ({ stats, trips, allTravelers, selectedTravelers, isSample, on
                     <button className="btn-primary" style={{ backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-main)', border: '1px solid #e2e8f0' }} onClick={() => setShowMap(!showMap)}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>🗺️ {showMap ? 'Hide Map' : 'Show Map'}</span>
                     </button>
+                    <button className="btn-primary" style={{ backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-main)', border: '1px solid #e2e8f0' }} onClick={() => setShowCountryList(true)}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>🌍 Manage Countries</span>
+                    </button>
                     <button className="btn-primary" style={{ backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-main)', border: '1px solid #e2e8f0' }} onClick={() => setShowAirlineStats(!showAirlineStats)}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><BarChart2 size={16} /> Airline Stats</span>
                     </button>
-                    <button className="btn-primary" style={{ backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-main)', border: '1px solid #e2e8f0' }} onClick={handleExport}>
+                    <button className="btn-primary" style={{ backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-main)', border: '1px solid #e2e8f0' }} onClick={handleExportCSV}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Download size={16} /> Export CSV</span>
+                    </button>
+
+                    <button className="btn-primary" style={{ backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-main)', border: '1px solid #e2e8f0' }} onClick={() => handleExportJSON(stats?._rawData)}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Download size={16} /> Export JSON</span>
                     </button>
 
                     <label className="btn-primary" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -175,7 +206,39 @@ const Dashboard = ({ stats, trips, allTravelers, selectedTravelers, isSample, on
 
             <StatsSummary stats={stats} />
 
-            {showMap && <FlightMap trips={trips} />}
+            {showMap && (
+                <div style={{ marginBottom: '2rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                        <button
+                            className="btn-primary"
+                            style={{
+                                backgroundColor: mapMode === 'flights' ? 'var(--color-primary)' : 'var(--color-bg-card)',
+                                color: mapMode === 'flights' ? 'white' : 'var(--color-text-main)',
+                                border: '1px solid #e2e8f0',
+                                padding: '0.5rem 1rem',
+                                fontSize: '0.9rem'
+                            }}
+                            onClick={() => setMapMode('flights')}
+                        >
+                            ✈️ Flight Paths
+                        </button>
+                        <button
+                            className="btn-primary"
+                            style={{
+                                backgroundColor: mapMode === 'countries' ? 'var(--color-primary)' : 'var(--color-bg-card)',
+                                color: mapMode === 'countries' ? 'white' : 'var(--color-text-main)',
+                                border: '1px solid #e2e8f0',
+                                padding: '0.5rem 1rem',
+                                fontSize: '0.9rem'
+                            }}
+                            onClick={() => setMapMode('countries')}
+                        >
+                            🌍 Visited Countries
+                        </button>
+                    </div>
+                    {mapMode === 'flights' ? <FlightMap trips={trips} /> : <VisitedCountriesMap stats={stats} automatedStats={automatedStats} manualVisitedCountries={manualVisitedCountries} onToggleCountry={onToggleCountry} />}
+                </div>
+            )}
 
             <YearlyBreakdown stats={stats} />
 
@@ -185,6 +248,16 @@ const Dashboard = ({ stats, trips, allTravelers, selectedTravelers, isSample, on
 
             {selectedTrip && (
                 <TripDetail trip={selectedTrip} onClose={() => setSelectedTrip(null)} />
+            )}
+
+            {showCountryList && (
+                <CountryListByContinent
+                    stats={stats}
+                    automatedStats={automatedStats}
+                    manualVisitedCountries={manualVisitedCountries}
+                    onToggleCountry={onToggleCountry}
+                    onClose={() => setShowCountryList(false)}
+                />
             )}
         </div>
     );

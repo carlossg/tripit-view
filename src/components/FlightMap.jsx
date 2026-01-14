@@ -109,7 +109,7 @@ const FlightMap = ({ trips }) => {
             .catch(err => console.error('Failed to load airport coordinates:', err));
     }, []);
 
-    const { flightPaths, uniqueAirports, bounds, topRoutes, topAirports } = useMemo(() => {
+    const { flightPaths, uniqueAirports, bounds, topRoutes, topAirports, airportCounts } = useMemo(() => {
         const paths = [];
         const airports = new Map();
         const allCoords = [];
@@ -172,7 +172,8 @@ const FlightMap = ({ trips }) => {
             uniqueAirports: Array.from(airports.entries()),
             bounds: allCoords.length > 0 ? L.latLngBounds(allCoords) : null,
             topRoutes: topRoutesMap,
-            topAirports: topAirportsMap
+            topAirports: topAirportsMap,
+            airportCounts
         };
     }, [trips, airportCoords]);
 
@@ -204,17 +205,18 @@ const FlightMap = ({ trips }) => {
 
     const getAirportStyle = (code) => {
         const top = topAirports.get(code);
+        const count = airportCounts[code] || 0;
         if (top) {
             return {
                 color: topColors[top.index],
                 size: 10,
-                count: top.count
+                count
             };
         }
         return {
             color: 'var(--color-primary)',
             size: 6,
-            count: 0
+            count
         };
     };
 
@@ -279,7 +281,7 @@ const FlightMap = ({ trips }) => {
                         >
                             <Popup>
                                 <strong>Airport: {code}</strong>
-                                {style.count > 0 && <><br />Total visits: {style.count}</>}
+                                <br />Total visits: {style.count}
                             </Popup>
                         </Marker>
                     );
