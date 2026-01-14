@@ -816,6 +816,47 @@
                     ]
                 }
             ]
+        },
+        {
+            "TripData": {
+                "id": "trip-23",
+                "display_name": "Oslo Summer 2024",
+                "start_date": "2024-08-15",
+                "end_date": "2024-08-22",
+                "primary_location": "Oslo, NO"
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "Norwegian Air",
+                        "marketing_airline_code": "DY",
+                        "marketing_flight_number": "7001",
+                        "StartDateTime": {
+                            "date": "2024-08-15",
+                            "time": "20:00:00"
+                        },
+                        "EndDateTime": {
+                            "date": "2024-08-16",
+                            "time": "09:00:00"
+                        },
+                        "start_airport_code": "JFK",
+                        "end_airport_code": "OSL",
+                        "distance": "3681"
+                    }
+                },
+                {
+                    "display_name": "Grand Hotel Oslo",
+                    "StartDateTime": {
+                        "date": "2024-08-16"
+                    },
+                    "EndDateTime": {
+                        "date": "2024-08-22"
+                    },
+                    "Address": {
+                        "city": "Oslo"
+                    }
+                }
+            ]
         }
     ]
 }
