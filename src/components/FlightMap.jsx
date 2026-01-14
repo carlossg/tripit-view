@@ -109,15 +109,27 @@ const FlightMap = ({ trips }) => {
             .catch(err => console.error('Failed to load airport coordinates:', err));
     }, []);
 
-    const { flightPaths, uniqueAirports, bounds } = useMemo(() => {
+    const { flightPaths, uniqueAirports, bounds, topRoutes, topAirports } = useMemo(() => {
         const paths = [];
         const airports = new Map();
         const allCoords = [];
+
+        // Frequency counters
+        const airportCounts = {};
+        const routeCounts = {};
 
         trips.forEach(trip => {
             trip.flights.forEach(flight => {
                 const originCoord = airportCoords[flight.origin];
                 const destCoord = airportCoords[flight.destination];
+
+                // Update airport counts
+                airportCounts[flight.origin] = (airportCounts[flight.origin] || 0) + 1;
+                airportCounts[flight.destination] = (airportCounts[flight.destination] || 0) + 1;
+
+                // Update route counts (bidirectional)
+                const routeKey = [flight.origin, flight.destination].sort().join('-');
+                routeCounts[routeKey] = (routeCounts[routeKey] || 0) + 1;
 
                 if (originCoord && destCoord) {
                     const arcPoints = getArcPoints(originCoord, destCoord);
@@ -126,26 +138,85 @@ const FlightMap = ({ trips }) => {
                     paths.push({
                         id: `${flight.origin}-${flight.destination}-${flight.start?.date}-${Math.random()}`,
                         segments,
-                        flight
+                        flight,
+                        routeKey
                     });
 
                     if (!airports.has(flight.origin)) airports.set(flight.origin, originCoord);
                     if (!airports.has(flight.destination)) airports.set(flight.destination, destCoord);
 
-                    // For bounds, we use the original coords (not wrapped) 
-                    // or Leaflet might get confused if we have -200
                     allCoords.push(originCoord);
                     allCoords.push(destCoord);
                 }
             });
         });
 
+        // Identify Top 5 Airports
+        const topAirportsList = Object.entries(airportCounts)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 5)
+            .map(([code, count], index) => ({ code, count, index }));
+
+        const topAirportsMap = new Map(topAirportsList.map(a => [a.code, a]));
+
+        // Identify Top 5 Routes
+        const topRoutesList = Object.entries(routeCounts)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 5)
+            .map(([key, count], index) => ({ key, count, index }));
+
+        const topRoutesMap = new Map(topRoutesList.map(r => [r.key, r]));
+
         return {
             flightPaths: paths,
             uniqueAirports: Array.from(airports.entries()),
-            bounds: allCoords.length > 0 ? L.latLngBounds(allCoords) : null
+            bounds: allCoords.length > 0 ? L.latLngBounds(allCoords) : null,
+            topRoutes: topRoutesMap,
+            topAirports: topAirportsMap
         };
     }, [trips, airportCoords]);
+
+    const topColors = [
+        '#FFD700', // Gold
+        '#FF8C00', // Dark Orange
+        '#FF1493', // Deep Pink
+        '#00CED1', // Dark Cyan
+        '#32CD32'  // Lime Green
+    ];
+
+    const getRouteStyle = (routeKey) => {
+        const top = topRoutes.get(routeKey);
+        if (top) {
+            return {
+                color: topColors[top.index],
+                weight: 3,
+                opacity: 0.8,
+                count: top.count
+            };
+        }
+        return {
+            color: 'var(--color-primary)',
+            weight: 1.5,
+            opacity: 0.4,
+            count: 0
+        };
+    };
+
+    const getAirportStyle = (code) => {
+        const top = topAirports.get(code);
+        if (top) {
+            return {
+                color: topColors[top.index],
+                size: 10,
+                count: top.count
+            };
+        }
+        return {
+            color: 'var(--color-primary)',
+            size: 6,
+            count: 0
+        };
+    };
 
     // CartoDB Dark Matter theme for a premium look
     const tileLayerUrl = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
@@ -166,45 +237,53 @@ const FlightMap = ({ trips }) => {
                     attribution={attribution}
                 />
 
-                {flightPaths.map(path => (
-                    <React.Fragment key={path.id}>
-                        {path.segments.map((segment, idx) => (
-                            <Polyline
-                                key={`${path.id}-seg-${idx}`}
-                                positions={segment}
-                                pathOptions={{
-                                    color: 'var(--color-primary)',
-                                    weight: 1.5,
-                                    opacity: 0.5,
-                                    lineCap: 'round'
-                                }}
-                            >
-                                <Popup>
-                                    <strong>{path.flight.airline} {path.flight.flightNumber}</strong><br />
-                                    {path.flight.origin} → {path.flight.destination}<br />
-                                    {path.flight.start?.date}
-                                </Popup>
-                            </Polyline>
-                        ))}
-                    </React.Fragment>
-                ))}
+                {flightPaths.map(path => {
+                    const style = getRouteStyle(path.routeKey);
+                    return (
+                        <React.Fragment key={path.id}>
+                            {path.segments.map((segment, idx) => (
+                                <Polyline
+                                    key={`${path.id}-seg-${idx}`}
+                                    positions={segment}
+                                    pathOptions={{
+                                        color: style.color,
+                                        weight: style.weight,
+                                        opacity: style.opacity,
+                                        lineCap: 'round'
+                                    }}
+                                >
+                                    <Popup>
+                                        <strong>{path.flight.airline} {path.flight.flightNumber}</strong><br />
+                                        {path.flight.origin} → {path.flight.destination}<br />
+                                        {path.flight.start?.date}
+                                        {style.count > 0 && <><br /><strong>Flights on this route: {style.count}</strong></>}
+                                    </Popup>
+                                </Polyline>
+                            ))}
+                        </React.Fragment>
+                    );
+                })}
 
-                {uniqueAirports.map(([code, coord]) => (
-                    <Marker
-                        key={code}
-                        position={coord}
-                        icon={L.divIcon({
-                            className: 'custom-marker',
-                            html: `<div style="background-color: var(--color-primary); width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid white; box-shadow: 0 0 3px rgba(0,0,0,0.4);"></div>`,
-                            iconSize: [6, 6],
-                            iconAnchor: [3, 3]
-                        })}
-                    >
-                        <Popup>
-                            <strong>Airport: {code}</strong>
-                        </Popup>
-                    </Marker>
-                ))}
+                {uniqueAirports.map(([code, coord]) => {
+                    const style = getAirportStyle(code);
+                    return (
+                        <Marker
+                            key={code}
+                            position={coord}
+                            icon={L.divIcon({
+                                className: 'custom-marker',
+                                html: `<div style="background-color: ${style.color}; width: ${style.size}px; height: ${style.size}px; border-radius: 50%; border: 1.5px solid white; box-shadow: 0 0 3px rgba(0,0,0,0.4);"></div>`,
+                                iconSize: [style.size, style.size],
+                                iconAnchor: [style.size / 2, style.size / 2]
+                            })}
+                        >
+                            <Popup>
+                                <strong>Airport: {code}</strong>
+                                {style.count > 0 && <><br />Total visits: {style.count}</>}
+                            </Popup>
+                        </Marker>
+                    );
+                })}
 
                 {bounds && <SetBounds bounds={bounds} />}
             </MapContainer>
