@@ -5,6 +5,7 @@ import YearlyBreakdown from './YearlyBreakdown';
 import TripList from './TripList';
 import TripDetail from './TripDetail';
 import AirlineStatsChart from './AirlineStatsChart';
+import FlightMap from './FlightMap';
 
 const SampleDataNotice = () => (
     <div className="card" style={{
@@ -38,6 +39,7 @@ const SampleDataNotice = () => (
 const Dashboard = ({ stats, trips, allTravelers, selectedTravelers, isSample, onTravelersChange, onDataLoaded }) => {
     const [selectedTrip, setSelectedTrip] = useState(null);
     const [showAirlineStats, setShowAirlineStats] = useState(false);
+    const [showMap, setShowMap] = useState(true);
     const [showTravelerFilter, setShowTravelerFilter] = useState(false);
 
     const handleFileInput = (e) => {
@@ -147,6 +149,9 @@ const Dashboard = ({ stats, trips, allTravelers, selectedTravelers, isSample, on
                         )}
                     </div>
 
+                    <button className="btn-primary" style={{ backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-main)', border: '1px solid #e2e8f0' }} onClick={() => setShowMap(!showMap)}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>🗺️ {showMap ? 'Hide Map' : 'Show Map'}</span>
+                    </button>
                     <button className="btn-primary" style={{ backgroundColor: 'var(--color-bg-card)', color: 'var(--color-text-main)', border: '1px solid #e2e8f0' }} onClick={() => setShowAirlineStats(!showAirlineStats)}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><BarChart2 size={16} /> Airline Stats</span>
                     </button>
@@ -169,6 +174,8 @@ const Dashboard = ({ stats, trips, allTravelers, selectedTravelers, isSample, on
             {isSample && <SampleDataNotice />}
 
             <StatsSummary stats={stats} />
+
+            {showMap && <FlightMap trips={trips} />}
 
             <YearlyBreakdown stats={stats} />
 

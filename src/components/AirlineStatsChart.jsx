@@ -1,7 +1,7 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
 
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload, label, airlineCodes }) => {
     if (active && payload && payload.length) {
         // Filter out zero values and sort by value descending
         const filteredPayload = payload
@@ -22,13 +22,18 @@ const CustomTooltip = ({ active, payload, label }) => {
                 position: 'relative'
             }}>
                 <p style={{ margin: '0 0 0.5rem 0', fontWeight: 'bold' }}>{label}</p>
-                {filteredPayload.map((entry, index) => (
-                    <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                        <div style={{ width: '10px', height: '10px', backgroundColor: entry.color, borderRadius: '2px' }}></div>
-                        <span style={{ color: 'var(--color-text-muted)' }}>{entry.name}:</span>
-                        <span style={{ fontWeight: 'bold' }}>{entry.value}</span>
-                    </div>
-                ))}
+                {filteredPayload.map((entry, index) => {
+                    const code = airlineCodes && airlineCodes[entry.name];
+                    return (
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                            <div style={{ width: '10px', height: '10px', backgroundColor: entry.color, borderRadius: '2px' }}></div>
+                            <span style={{ color: 'var(--color-text-muted)' }}>
+                                {entry.name}{code ? ` (${code})` : ''}:
+                            </span>
+                            <span style={{ fontWeight: 'bold' }}>{entry.value}</span>
+                        </div>
+                    );
+                })}
             </div>
         );
     }
@@ -37,6 +42,8 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const AirlineStatsChart = ({ stats }) => {
     if (!stats || !stats.years) return null;
+
+    const airlineCodes = stats.airlineCodes || {};
 
     // Get all unique airlines and their total counts
     const airlineCounts = {};
@@ -62,24 +69,83 @@ const AirlineStatsChart = ({ stats }) => {
         })
         .sort((a, b) => a.year.localeCompare(b.year));
 
-    // Colors for different airlines - using a palette
+    // Colors for different airlines - expanded palette for better differentiation
     const colors = [
         '#2563eb', '#db2777', '#10b981', '#f59e0b', '#7c3aed',
-        '#ef4444', '#06b6d4', '#8b5cf6', '#ec4899', '#14b8a6'
+        '#ef4444', '#06b6d4', '#8b5cf6', '#ec4899', '#14b8a6',
+        '#f97316', '#84cc16', '#06b6d4', '#6366f1', '#a855f7',
+        '#d946ef', '#f43f5e', '#fbbf24', '#34d399', '#2dd4bf',
+        '#3b82f6', '#9333ea', '#e11d48', '#ea580c', '#16a34a',
+        '#2563eb', '#4f46e5', '#7c3aed', '#9333ea', '#c026d3',
+        '#db2777', '#e11d48', '#f43f5e', '#fb7185', '#fda4af',
+        '#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7',
+        '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#ecfdf5',
+        '#06b6d4', '#22d3ee', '#67e8f9', '#a5f3fc', '#ecfeff',
+        '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe', '#e0e7ff',
+        '#a855f7', '#c084fc', '#d8b4fe', '#e9d5ff', '#f5f3ff'
     ];
 
+    // Helper to get color for an airline to ensure consistency
+    const getAirlineColor = (airline, index) => {
+        return colors[index % colors.length];
+    };
+
     // Prepare data for All-Time chart
-    const allTimeData = airlineList.map(airline => ({
+    const allTimeData = airlineList.map((airline, index) => ({
         name: airline,
-        flights: airlineCounts[airline]
-    })).slice(0, 15); // Show top 15
+        code: airlineCodes[airline] || '',
+        flights: airlineCounts[airline],
+        color: getAirlineColor(airline, index)
+    })).slice(0, 20);
+
+    // Custom label for stacked bars to show IATA code inside if it fits
+    const renderStackedBarLabel = (props) => {
+        const { x, y, width, height, value, airlineName } = props;
+        const code = airlineCodes[airlineName];
+        // Only show if the bar is wide enough, tall enough, and has a value
+        if (value > 0 && width > 20 && height > 15 && code) {
+            return (
+                <text
+                    x={x + width / 2}
+                    y={y + height / 2}
+                    fill="#fff"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize={10}
+                    style={{ pointerEvents: 'none', fontWeight: 'bold', textShadow: '0 0 2px rgba(0,0,0,0.5)' }}
+                >
+                    {code}
+                </text>
+            );
+        }
+        return null;
+    };
+
+    // Custom label for vertical bars to show "Code - Count" or just "Count"
+    const renderVerticalBarLabel = (props) => {
+        const { x, y, width, height, value, index } = props;
+        const entry = allTimeData[index];
+        const labelText = entry && entry.code ? `${entry.code}: ${value}` : value;
+
+        return (
+            <text
+                x={x + width + 5}
+                y={y + height / 2}
+                fill="var(--color-text-muted)"
+                fontSize={12}
+                dominantBaseline="middle"
+            >
+                {labelText}
+            </text>
+        );
+    };
 
     return (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem', marginTop: '2rem', marginBottom: '2rem' }}>
             {/* Yearly Stacked Chart */}
             <div className="card">
                 <h2 style={{ marginBottom: '1.5rem' }}>Flights by Airline per Year</h2>
-                <div style={{ height: '400px', width: '100%' }}>
+                <div style={{ height: '450px', width: '100%' }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                             data={data}
@@ -89,7 +155,7 @@ const AirlineStatsChart = ({ stats }) => {
                             <XAxis dataKey="year" axisLine={false} tickLine={false} />
                             <YAxis axisLine={false} tickLine={false} />
                             <Tooltip
-                                content={<CustomTooltip />}
+                                content={<CustomTooltip airlineCodes={airlineCodes} />}
                                 wrapperStyle={{ zIndex: 10000 }}
                             />
                             <Legend />
@@ -98,8 +164,10 @@ const AirlineStatsChart = ({ stats }) => {
                                     key={airline}
                                     dataKey={airline}
                                     stackId="a"
-                                    fill={colors[index % colors.length]}
+                                    fill={getAirlineColor(airline, index)}
+                                    // Last bar in stack gets top rounding
                                     radius={index === airlineList.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                                    label={(props) => renderStackedBarLabel({ ...props, airlineName: airline })}
                                 />
                             ))}
                         </BarChart>
@@ -110,19 +178,19 @@ const AirlineStatsChart = ({ stats }) => {
             {/* All-Time Bar Chart */}
             <div className="card">
                 <h2 style={{ marginBottom: '1.5rem' }}>All-Time Top Airlines</h2>
-                <div style={{ height: airlineList.length * 30 + 100, minHeight: '300px', width: '100%' }}>
+                <div style={{ height: allTimeData.length * 35 + 100, minHeight: '400px', width: '100%' }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                             layout="vertical"
                             data={allTimeData}
-                            margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                            margin={{ top: 5, right: 60, left: 40, bottom: 5 }} // Increased right margin for labels
                         >
                             <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
                             <XAxis type="number" hide />
                             <YAxis
-                                dataKey="name"
+                                dataKey="name" // Back to full name
                                 type="category"
-                                width={120}
+                                width={150}
                                 axisLine={false}
                                 tickLine={false}
                                 style={{ fontSize: '0.875rem' }}
@@ -138,10 +206,13 @@ const AirlineStatsChart = ({ stats }) => {
                             />
                             <Bar
                                 dataKey="flights"
-                                fill="var(--color-primary)"
                                 radius={[0, 4, 4, 0]}
-                                label={{ position: 'right', fill: 'var(--color-text-muted)', fontSize: 12 }}
-                            />
+                                label={renderVerticalBarLabel}
+                            >
+                                {allTimeData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                            </Bar>
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

@@ -2,91 +2,58 @@
     "Trips": [
         {
             "TripData": {
-                "id": "sample-trip-1",
-                "display_name": "Summer in Europe",
+                "id": "trip-1",
+                "display_name": "Summer in Europe 2024",
                 "start_date": "2024-07-10",
                 "end_date": "2024-07-20",
-                "primary_location": "Paris, France",
-                "PrimaryLocationAddress": {
-                    "city": "Paris",
-                    "country": "FR"
-                },
-                "image_url": "https://www.tripit.com/images/places/fr/paris.jpg"
+                "primary_location": "Paris, FR"
             },
             "Objects": [
                 {
-                    "Segment": [
-                        {
-                            "marketing_airline": "Air France",
-                            "marketing_airline_code": "AF",
-                            "marketing_flight_number": "123",
-                            "StartDateTime": {
-                                "date": "2024-07-10",
-                                "time": "10:00:00",
-                                "timezone": "Europe/Paris"
-                            },
-                            "EndDateTime": {
-                                "date": "2024-07-10",
-                                "time": "18:00:00",
-                                "timezone": "Europe/Paris"
-                            },
-                            "start_airport_code": "JFK",
-                            "end_airport_code": "CDG",
-                            "duration": "8h 0m",
-                            "distance": "3,635 mi",
-                            "aircraft_display_name": "Boeing 777"
-                        }
-                    ],
+                    "Segment": {
+                        "marketing_airline": "Air France",
+                        "marketing_airline_code": "AF",
+                        "marketing_flight_number": "123",
+                        "StartDateTime": {
+                            "date": "2024-07-10",
+                            "time": "10:00:00"
+                        },
+                        "EndDateTime": {
+                            "date": "2024-07-10",
+                            "time": "18:00:00"
+                        },
+                        "start_airport_code": "JFK",
+                        "end_airport_code": "CDG",
+                        "distance": "3635"
+                    },
                     "Traveler": [
                         {
                             "first_name": "Alice",
-                            "last_name": "Smith"
-                        },
-                        {
-                            "first_name": "Bob",
                             "last_name": "Smith"
                         }
                     ]
                 },
                 {
                     "display_name": "Hotel Eiffel",
-                    "room_type": "Deluxe Room",
                     "StartDateTime": {
-                        "date": "2024-07-10",
-                        "time": "15:00:00"
+                        "date": "2024-07-10"
                     },
                     "EndDateTime": {
-                        "date": "2024-07-20",
-                        "time": "11:00:00"
+                        "date": "2024-07-20"
                     },
                     "Address": {
-                        "address": "123 Rue de Paris",
                         "city": "Paris"
-                    },
-                    "Guest": [
-                        {
-                            "first_name": "Alice",
-                            "last_name": "Smith"
-                        },
-                        {
-                            "first_name": "Bob",
-                            "last_name": "Smith"
-                        }
-                    ]
+                    }
                 }
             ]
         },
         {
             "TripData": {
-                "id": "sample-trip-2",
-                "display_name": "Business Trip to Tokyo",
-                "start_date": "2024-11-05",
-                "end_date": "2024-11-08",
-                "primary_location": "Tokyo, Japan",
-                "PrimaryLocationAddress": {
-                    "city": "Tokyo",
-                    "country": "JP"
-                }
+                "id": "trip-2",
+                "display_name": "Business to Tokyo 2023",
+                "start_date": "2023-11-05",
+                "end_date": "2023-11-12",
+                "primary_location": "Tokyo, JP"
             },
             "Objects": [
                 {
@@ -95,57 +62,756 @@
                         "marketing_airline_code": "JL",
                         "marketing_flight_number": "45",
                         "StartDateTime": {
-                            "date": "2024-11-05",
-                            "time": "12:00:00"
+                            "date": "2023-11-05"
                         },
                         "EndDateTime": {
-                            "date": "2024-11-06",
-                            "time": "16:00:00"
+                            "date": "2023-11-06"
                         },
                         "start_airport_code": "LHR",
                         "end_airport_code": "HND",
-                        "duration": "14h 0m",
-                        "distance": "5,974 mi"
+                        "distance": "5974"
+                    }
+                },
+                {
+                    "display_name": "Park Hyatt",
+                    "StartDateTime": {
+                        "date": "2023-11-06"
                     },
-                    "Traveler": {
-                        "first_name": "Alice",
-                        "last_name": "Smith"
+                    "EndDateTime": {
+                        "date": "2023-11-12"
                     }
                 }
             ]
         },
         {
             "TripData": {
-                "id": "sample-trip-3",
-                "display_name": "Weekend in Tahoe",
-                "start_date": "2025-01-15",
-                "end_date": "2025-01-17",
-                "primary_location": "Lake Tahoe, CA",
-                "PrimaryLocationAddress": {
-                    "city": "South Lake Tahoe",
-                    "country": "US"
-                }
+                "id": "trip-3",
+                "display_name": "Road Trip SF 2022",
+                "start_date": "2022-05-15",
+                "end_date": "2022-05-25",
+                "primary_location": "San Francisco, CA"
             },
             "Objects": [
                 {
-                    "display_name": "Hertz Car Rental",
-                    "supplier_name": "Hertz",
+                    "Segment": {
+                        "marketing_airline": "United Airlines",
+                        "marketing_airline_code": "UA",
+                        "marketing_flight_number": "201",
+                        "StartDateTime": {
+                            "date": "2022-05-15"
+                        },
+                        "EndDateTime": {
+                            "date": "2022-05-15"
+                        },
+                        "start_airport_code": "EWR",
+                        "end_airport_code": "SFO",
+                        "distance": "2565"
+                    }
+                },
+                {
+                    "display_name": "Fairmont",
                     "StartDateTime": {
-                        "date": "2025-01-15",
-                        "time": "09:00:00"
+                        "date": "2022-05-15"
                     },
                     "EndDateTime": {
-                        "date": "2025-01-17",
-                        "time": "17:00:00"
-                    },
-                    "Traveler": [
+                        "date": "2022-05-20"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-4",
+                "display_name": "London Holidays 2021",
+                "start_date": "2021-12-20",
+                "end_date": "2021-12-30",
+                "primary_location": "London, UK"
+            },
+            "Objects": [
+                {
+                    "Segment": [
                         {
-                            "first_name": "Bob",
-                            "last_name": "Smith"
+                            "marketing_airline": "British Airways",
+                            "marketing_airline_code": "BA",
+                            "marketing_flight_number": "178",
+                            "StartDateTime": {
+                                "date": "2021-12-20"
+                            },
+                            "EndDateTime": {
+                                "date": "2021-12-20"
+                            },
+                            "start_airport_code": "JFK",
+                            "end_airport_code": "LHR",
+                            "distance": "3451"
                         },
                         {
-                            "first_name": "Charlie",
-                            "last_name": "Jones"
+                            "marketing_airline": "Lufthansa",
+                            "marketing_airline_code": "LH",
+                            "marketing_flight_number": "901",
+                            "StartDateTime": {
+                                "date": "2021-12-25"
+                            },
+                            "EndDateTime": {
+                                "date": "2021-12-25"
+                            },
+                            "start_airport_code": "LHR",
+                            "end_airport_code": "FRA",
+                            "distance": "400"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-5",
+                "display_name": "Munich 2020",
+                "start_date": "2020-09-20",
+                "end_date": "2020-09-25",
+                "primary_location": "Munich, DE"
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "Lufthansa",
+                        "marketing_airline_code": "LH",
+                        "marketing_flight_number": "423",
+                        "StartDateTime": {
+                            "date": "2020-09-20"
+                        },
+                        "EndDateTime": {
+                            "date": "2020-09-20"
+                        },
+                        "start_airport_code": "BOS",
+                        "end_airport_code": "MUC",
+                        "distance": "3845"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-6",
+                "display_name": "Sydney NYE 2025",
+                "start_date": "2024-12-28",
+                "end_date": "2025-01-05",
+                "primary_location": "Sydney, AU"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "Qantas",
+                            "marketing_airline_code": "QF",
+                            "marketing_flight_number": "12",
+                            "StartDateTime": {
+                                "date": "2024-12-28"
+                            },
+                            "EndDateTime": {
+                                "date": "2024-12-30"
+                            },
+                            "start_airport_code": "LAX",
+                            "end_airport_code": "SYD",
+                            "distance": "7488"
+                        },
+                        {
+                            "marketing_airline": "Emirates",
+                            "marketing_airline_code": "EK",
+                            "marketing_flight_number": "412",
+                            "StartDateTime": {
+                                "date": "2025-01-05"
+                            },
+                            "EndDateTime": {
+                                "date": "2025-01-06"
+                            },
+                            "start_airport_code": "SYD",
+                            "end_airport_code": "DXB",
+                            "distance": "7500"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-7",
+                "display_name": "Tech Berlin 2024",
+                "start_date": "2024-03-10",
+                "end_date": "2024-03-15",
+                "primary_location": "Berlin, DE"
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "United Airlines",
+                        "marketing_airline_code": "UA",
+                        "marketing_flight_number": "962",
+                        "StartDateTime": {
+                            "date": "2024-03-10"
+                        },
+                        "EndDateTime": {
+                            "date": "2024-03-11"
+                        },
+                        "start_airport_code": "EWR",
+                        "end_airport_code": "BER",
+                        "distance": "3969"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-8",
+                "display_name": "Singapore 2023",
+                "start_date": "2023-06-01",
+                "end_date": "2023-06-10",
+                "primary_location": "Singapore, SG"
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "Singapore Airlines",
+                        "marketing_airline_code": "SQ",
+                        "marketing_flight_number": "21",
+                        "StartDateTime": {
+                            "date": "2023-06-01"
+                        },
+                        "EndDateTime": {
+                            "date": "2023-06-02"
+                        },
+                        "start_airport_code": "EWR",
+                        "end_airport_code": "SIN",
+                        "distance": "9534"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-9",
+                "display_name": "Dubai 2022",
+                "start_date": "2022-10-10",
+                "end_date": "2022-10-15",
+                "primary_location": "Dubai, AE"
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "Emirates",
+                        "marketing_airline_code": "EK",
+                        "marketing_flight_number": "202",
+                        "StartDateTime": {
+                            "date": "2022-10-10"
+                        },
+                        "EndDateTime": {
+                            "date": "2022-10-11"
+                        },
+                        "start_airport_code": "JFK",
+                        "end_airport_code": "DXB",
+                        "distance": "6849"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-10",
+                "display_name": "Madrid 2024",
+                "start_date": "2024-05-20",
+                "end_date": "2024-05-25",
+                "primary_location": "Madrid, ES"
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "Iberia",
+                        "marketing_airline_code": "IB",
+                        "marketing_flight_number": "6252",
+                        "StartDateTime": {
+                            "date": "2024-05-20"
+                        },
+                        "EndDateTime": {
+                            "date": "2024-05-21"
+                        },
+                        "start_airport_code": "JFK",
+                        "end_airport_code": "MAD",
+                        "distance": "3589"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-11",
+                "display_name": "Rome History 2019",
+                "start_date": "2019-04-10",
+                "end_date": "2019-04-20",
+                "primary_location": "Rome, IT"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "ITA Airways",
+                            "marketing_airline_code": "AZ",
+                            "marketing_flight_number": "609",
+                            "StartDateTime": {
+                                "date": "2019-04-10"
+                            },
+                            "EndDateTime": {
+                                "date": "2019-04-11"
+                            },
+                            "start_airport_code": "JFK",
+                            "end_airport_code": "FCO",
+                            "distance": "4280"
+                        },
+                        {
+                            "marketing_airline": "Lufthansa",
+                            "marketing_airline_code": "LH",
+                            "marketing_flight_number": "233",
+                            "StartDateTime": {
+                                "date": "2019-04-15"
+                            },
+                            "EndDateTime": {
+                                "date": "2019-04-15"
+                            },
+                            "start_airport_code": "FCO",
+                            "end_airport_code": "FRA",
+                            "distance": "600"
+                        }
+                    ]
+                },
+                {
+                    "display_name": "Hotel Quirinale",
+                    "StartDateTime": {
+                        "date": "2019-04-11"
+                    },
+                    "EndDateTime": {
+                        "date": "2019-04-20"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-12",
+                "display_name": "Amsterdam Canals 2021",
+                "start_date": "2021-06-15",
+                "end_date": "2021-06-22",
+                "primary_location": "Amsterdam, NL"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "KLM",
+                            "marketing_airline_code": "KL",
+                            "marketing_flight_number": "642",
+                            "StartDateTime": {
+                                "date": "2021-06-15"
+                            },
+                            "EndDateTime": {
+                                "date": "2021-06-16"
+                            },
+                            "start_airport_code": "JFK",
+                            "end_airport_code": "AMS",
+                            "distance": "3633"
+                        },
+                        {
+                            "marketing_airline": "KLM",
+                            "marketing_airline_code": "KL",
+                            "marketing_flight_number": "1234",
+                            "StartDateTime": {
+                                "date": "2021-06-22"
+                            },
+                            "EndDateTime": {
+                                "date": "2021-06-22"
+                            },
+                            "start_airport_code": "AMS",
+                            "end_airport_code": "CDG",
+                            "distance": "260"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-13",
+                "display_name": "Zurich Alps 2022",
+                "start_date": "2022-01-10",
+                "end_date": "2022-01-18",
+                "primary_location": "Zurich, CH"
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "Swiss",
+                        "marketing_airline_code": "LX",
+                        "marketing_flight_number": "15",
+                        "StartDateTime": {
+                            "date": "2022-01-10"
+                        },
+                        "EndDateTime": {
+                            "date": "2022-01-11"
+                        },
+                        "start_airport_code": "JFK",
+                        "end_airport_code": "ZRH",
+                        "distance": "3931"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-14",
+                "display_name": "Hong Kong Fast 2023",
+                "start_date": "2023-03-05",
+                "end_date": "2023-03-12",
+                "primary_location": "Hong Kong, HK"
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "Cathay Pacific",
+                        "marketing_airline_code": "CX",
+                        "marketing_flight_number": "841",
+                        "StartDateTime": {
+                            "date": "2023-03-05"
+                        },
+                        "EndDateTime": {
+                            "date": "2023-03-06"
+                        },
+                        "start_airport_code": "JFK",
+                        "end_airport_code": "HKG",
+                        "distance": "8072"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-15",
+                "display_name": "Seoul Soul 2024",
+                "start_date": "2024-05-10",
+                "end_date": "2024-05-18",
+                "primary_location": "Seoul, KR"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "Korean Air",
+                            "marketing_airline_code": "KE",
+                            "marketing_flight_number": "82",
+                            "StartDateTime": {
+                                "date": "2024-05-10"
+                            },
+                            "EndDateTime": {
+                                "date": "2024-05-11"
+                            },
+                            "start_airport_code": "JFK",
+                            "end_airport_code": "ICN",
+                            "distance": "6906"
+                        },
+                        {
+                            "marketing_airline": "Korean Air",
+                            "marketing_airline_code": "KE",
+                            "marketing_flight_number": "721",
+                            "StartDateTime": {
+                                "date": "2024-05-15"
+                            },
+                            "EndDateTime": {
+                                "date": "2024-05-15"
+                            },
+                            "start_airport_code": "ICN",
+                            "end_airport_code": "NRT",
+                            "distance": "783"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-16",
+                "display_name": "Bangkok Food 2020",
+                "start_date": "2020-02-10",
+                "end_date": "2020-02-20",
+                "primary_location": "Bangkok, TH"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "Thai Airways",
+                            "marketing_airline_code": "TG",
+                            "marketing_flight_number": "601",
+                            "StartDateTime": {
+                                "date": "2020-02-10"
+                            },
+                            "EndDateTime": {
+                                "date": "2020-02-11"
+                            },
+                            "start_airport_code": "HKG",
+                            "end_airport_code": "BKK",
+                            "distance": "1049"
+                        },
+                        {
+                            "marketing_airline": "Singapore Airlines",
+                            "marketing_airline_code": "SQ",
+                            "marketing_flight_number": "970",
+                            "StartDateTime": {
+                                "date": "2020-02-15"
+                            },
+                            "EndDateTime": {
+                                "date": "2020-02-15"
+                            },
+                            "start_airport_code": "BKK",
+                            "end_airport_code": "SIN",
+                            "distance": "890"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-17",
+                "display_name": "Sao Paulo Business 2022",
+                "start_date": "2022-08-05",
+                "end_date": "2022-08-12",
+                "primary_location": "Sao Paulo, BR"
+            },
+            "Objects": [
+                {
+                    "Segment": {
+                        "marketing_airline": "LATAM",
+                        "marketing_airline_code": "LA",
+                        "marketing_flight_number": "8101",
+                        "StartDateTime": {
+                            "date": "2022-08-05"
+                        },
+                        "EndDateTime": {
+                            "date": "2022-08-06"
+                        },
+                        "start_airport_code": "JFK",
+                        "end_airport_code": "GRU",
+                        "distance": "4758"
+                    }
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-18",
+                "display_name": "Toronto Weekend 2023",
+                "start_date": "2023-10-12",
+                "end_date": "2023-10-15",
+                "primary_location": "Toronto, CA"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "Air Canada",
+                            "marketing_airline_code": "AC",
+                            "marketing_flight_number": "701",
+                            "StartDateTime": {
+                                "date": "2023-10-12"
+                            },
+                            "EndDateTime": {
+                                "date": "2023-10-12"
+                            },
+                            "start_airport_code": "LGA",
+                            "end_airport_code": "YYZ",
+                            "distance": "357"
+                        },
+                        {
+                            "marketing_airline": "Air Canada",
+                            "marketing_airline_code": "AC",
+                            "marketing_flight_number": "702",
+                            "StartDateTime": {
+                                "date": "2023-10-15"
+                            },
+                            "EndDateTime": {
+                                "date": "2023-10-15"
+                            },
+                            "start_airport_code": "YYZ",
+                            "end_airport_code": "LGA",
+                            "distance": "357"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-19",
+                "display_name": "Mexico City Culture 2021",
+                "start_date": "2021-03-10",
+                "end_date": "2021-03-17",
+                "primary_location": "Mexico City, MX"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "Aeromexico",
+                            "marketing_airline_code": "AM",
+                            "marketing_flight_number": "403",
+                            "StartDateTime": {
+                                "date": "2021-03-10"
+                            },
+                            "EndDateTime": {
+                                "date": "2021-03-10"
+                            },
+                            "start_airport_code": "JFK",
+                            "end_airport_code": "MEX",
+                            "distance": "2090"
+                        },
+                        {
+                            "marketing_airline": "Delta",
+                            "marketing_airline_code": "DL",
+                            "marketing_flight_number": "123",
+                            "StartDateTime": {
+                                "date": "2021-03-17"
+                            },
+                            "EndDateTime": {
+                                "date": "2021-03-17"
+                            },
+                            "start_airport_code": "MEX",
+                            "end_airport_code": "ATL",
+                            "distance": "1210"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-20",
+                "display_name": "Auckland Nature 2025",
+                "start_date": "2025-02-15",
+                "end_date": "2025-02-25",
+                "primary_location": "Auckland, NZ"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "Air New Zealand",
+                            "marketing_airline_code": "NZ",
+                            "marketing_flight_number": "1",
+                            "StartDateTime": {
+                                "date": "2025-02-15"
+                            },
+                            "EndDateTime": {
+                                "date": "2025-02-16"
+                            },
+                            "start_airport_code": "JFK",
+                            "end_airport_code": "AKL",
+                            "distance": "8828"
+                        },
+                        {
+                            "marketing_airline": "Air New Zealand",
+                            "marketing_airline_code": "NZ",
+                            "marketing_flight_number": "501",
+                            "StartDateTime": {
+                                "date": "2025-02-20"
+                            },
+                            "EndDateTime": {
+                                "date": "2025-02-20"
+                            },
+                            "start_airport_code": "AKL",
+                            "end_airport_code": "CHC",
+                            "distance": "473"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-21",
+                "display_name": "Lisbon Coast 2018",
+                "start_date": "2018-07-10",
+                "end_date": "2018-07-20",
+                "primary_location": "Lisbon, PT"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "TAP Air Portugal",
+                            "marketing_airline_code": "TP",
+                            "marketing_flight_number": "202",
+                            "StartDateTime": {
+                                "date": "2018-07-10"
+                            },
+                            "EndDateTime": {
+                                "date": "2018-07-11"
+                            },
+                            "start_airport_code": "EWR",
+                            "end_airport_code": "LIS",
+                            "distance": "3385"
+                        },
+                        {
+                            "marketing_airline": "TAP Air Portugal",
+                            "marketing_airline_code": "TP",
+                            "marketing_flight_number": "1234",
+                            "StartDateTime": {
+                                "date": "2018-07-15"
+                            },
+                            "EndDateTime": {
+                                "date": "2018-07-15"
+                            },
+                            "start_airport_code": "LIS",
+                            "end_airport_code": "MAD",
+                            "distance": "319"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "TripData": {
+                "id": "trip-22",
+                "display_name": "Cape Town Safari 2019",
+                "start_date": "2019-11-20",
+                "end_date": "2019-12-05",
+                "primary_location": "Cape Town, ZA"
+            },
+            "Objects": [
+                {
+                    "Segment": [
+                        {
+                            "marketing_airline": "South African Airways",
+                            "marketing_airline_code": "SA",
+                            "marketing_flight_number": "204",
+                            "StartDateTime": {
+                                "date": "2019-11-20"
+                            },
+                            "EndDateTime": {
+                                "date": "2019-11-21"
+                            },
+                            "start_airport_code": "JFK",
+                            "end_airport_code": "JNB",
+                            "distance": "7969"
+                        },
+                        {
+                            "marketing_airline": "South African Airways",
+                            "marketing_airline_code": "SA",
+                            "marketing_flight_number": "303",
+                            "StartDateTime": {
+                                "date": "2019-11-22"
+                            },
+                            "EndDateTime": {
+                                "date": "2019-11-22"
+                            },
+                            "start_airport_code": "JNB",
+                            "end_airport_code": "CPT",
+                            "distance": "790"
                         }
                     ]
                 }

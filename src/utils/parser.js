@@ -99,6 +99,7 @@ export const parseTrips = (jsonData) => {
                             duration: seg.duration,
                             distance: seg.distance,
                             aircraft: seg.aircraft_display_name,
+                            airlineCode: seg.marketing_airline_code,
                             travelers: objTravelers
                         };
                         timeline.push(flightData);
@@ -113,6 +114,7 @@ export const parseTrips = (jsonData) => {
                     type: 'flight',
                     name: 'Flight (Details Unavailable)',
                     airline: obj.booking_site_name || 'Unknown Airline',
+                    airlineCode: '',
                     flightNumber: 'Unknown',
                     start: { date: flightDate },
                     end: { date: flightDate },
@@ -168,7 +170,7 @@ export const parseTrips = (jsonData) => {
 
         return {
             id: data.id || Math.random().toString(36),
-            displayName: data.display_name,
+            displayName: data.displayName || data.display_name,
             location: data.primary_location,
             startDate: data.start_date,
             endDate: data.end_date,
@@ -195,6 +197,7 @@ export const calculateStats = (trips) => {
         totalDays: 0,
         countriesVisited: new Set(),
         airlines: {},
+        airlineCodes: {}, // Mapping name -> code
         years: {},
         allTravelers: new Set()
     };
@@ -272,6 +275,10 @@ export const calculateStats = (trips) => {
 
             const airline = flight.airline || 'Unknown';
             stats.airlines[airline] = (stats.airlines[airline] || 0) + 1;
+
+            if (flight.airlineCode && !stats.airlineCodes[airline]) {
+                stats.airlineCodes[airline] = flight.airlineCode;
+            }
 
             // Track airline frequency per year
             if (!stats.years[fYear].airlines) stats.years[fYear].airlines = {};

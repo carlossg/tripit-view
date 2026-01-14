@@ -1,0 +1,215 @@
+import React, { useMemo, useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix for default marker icons in React Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+// Component to handle map bounds
+function SetBounds({ bounds }) {
+    const map = useMap();
+    useEffect(() => {
+        if (bounds && bounds.isValid()) {
+            map.fitBounds(bounds, { padding: [100, 100], maxZoom: 10 });
+        }
+    }, [bounds, map]);
+    return null;
+}
+
+// Helper to wrap longitudes for shortest path crossing 180th meridian
+const wrapLongitude = (lon1, lon2) => {
+    const diff = lon2 - lon1;
+    if (diff > 180) return lon2 - 360;
+    if (diff < -180) return lon2 + 360;
+    return lon2;
+};
+
+// Helper to normalize longitude to [-180, 180]
+const normalizeLon = (lon) => {
+    let n = lon;
+    while (n > 180) n -= 360;
+    while (n < -180) n += 360;
+    return n;
+};
+
+// Helper to generate arc points for curved lines
+const getArcPoints = (start, end) => {
+    const points = [];
+    const steps = 60;
+
+    const startLat = start[0];
+    const startLon = start[1];
+    const endLat = end[0];
+    const targetLon = wrapLongitude(startLon, end[1]);
+
+    // Calculate distance and average latitude for curvature
+    const dLat = endLat - startLat;
+    const dLon = targetLon - startLon;
+    const dist = Math.sqrt(dLat * dLat + dLon * dLon);
+
+    const avgLat = (startLat + endLat) / 2;
+    // Bulge direction: Towards North Pole in NH, Towards South Pole in SH
+    const bulgeDir = avgLat >= 0 ? 1 : -1;
+
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+
+        // Linear interpolation
+        const lat = startLat + dLat * t;
+        const lon = startLon + dLon * t;
+
+        // Curvature bulge
+        const bulge = Math.sin(Math.PI * t) * (dist * 0.15) * bulgeDir;
+
+        points.push([lat + bulge, lon]);
+    }
+    return points;
+};
+
+// Split a path that crosses the antimeridian into multiple segments
+const splitPath = (points) => {
+    if (points.length < 2) return [points];
+
+    const segments = [];
+    let currentChunk = [[points[0][0], normalizeLon(points[0][1])]];
+
+    for (let i = 1; i < points.length; i++) {
+        const prevLon = normalizeLon(points[i - 1][1]);
+        const currLon = normalizeLon(points[i][1]);
+        const currLat = points[i][0];
+
+        if (Math.abs(currLon - prevLon) > 180) {
+            // Found a crossing!
+            segments.push(currentChunk);
+            currentChunk = [];
+
+            // Note: For a perfectly clean line we'd interpolate to exactly 180/ -180
+            // but with enough steps it's visually fine.
+        }
+        currentChunk.push([currLat, currLon]);
+    }
+    segments.push(currentChunk);
+    return segments;
+};
+
+const FlightMap = ({ trips }) => {
+    const [airportCoords, setAirportCoords] = useState({});
+
+    useEffect(() => {
+        const baseUrl = import.meta.env.BASE_URL || '/';
+        fetch(`${baseUrl}airports_coords.json`)
+            .then(r => r.json())
+            .then(data => setAirportCoords(data))
+            .catch(err => console.error('Failed to load airport coordinates:', err));
+    }, []);
+
+    const { flightPaths, uniqueAirports, bounds } = useMemo(() => {
+        const paths = [];
+        const airports = new Map();
+        const allCoords = [];
+
+        trips.forEach(trip => {
+            trip.flights.forEach(flight => {
+                const originCoord = airportCoords[flight.origin];
+                const destCoord = airportCoords[flight.destination];
+
+                if (originCoord && destCoord) {
+                    const arcPoints = getArcPoints(originCoord, destCoord);
+                    const segments = splitPath(arcPoints);
+
+                    paths.push({
+                        id: `${flight.origin}-${flight.destination}-${flight.start?.date}-${Math.random()}`,
+                        segments,
+                        flight
+                    });
+
+                    if (!airports.has(flight.origin)) airports.set(flight.origin, originCoord);
+                    if (!airports.has(flight.destination)) airports.set(flight.destination, destCoord);
+
+                    // For bounds, we use the original coords (not wrapped) 
+                    // or Leaflet might get confused if we have -200
+                    allCoords.push(originCoord);
+                    allCoords.push(destCoord);
+                }
+            });
+        });
+
+        return {
+            flightPaths: paths,
+            uniqueAirports: Array.from(airports.entries()),
+            bounds: allCoords.length > 0 ? L.latLngBounds(allCoords) : null
+        };
+    }, [trips, airportCoords]);
+
+    // CartoDB Dark Matter theme for a premium look
+    const tileLayerUrl = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+    return (
+        <div className="card" style={{ height: '650px', padding: 0, overflow: 'hidden', marginBottom: '2rem', border: 'none' }}>
+            <MapContainer
+                center={[20, 0]}
+                zoom={2}
+                minZoom={2}
+                worldCopyJump={true}
+                style={{ height: '100%', width: '100%' }}
+                scrollWheelZoom={true}
+            >
+                <TileLayer
+                    url={tileLayerUrl}
+                    attribution={attribution}
+                />
+
+                {flightPaths.map(path => (
+                    <React.Fragment key={path.id}>
+                        {path.segments.map((segment, idx) => (
+                            <Polyline
+                                key={`${path.id}-seg-${idx}`}
+                                positions={segment}
+                                pathOptions={{
+                                    color: 'var(--color-primary)',
+                                    weight: 1.5,
+                                    opacity: 0.5,
+                                    lineCap: 'round'
+                                }}
+                            >
+                                <Popup>
+                                    <strong>{path.flight.airline} {path.flight.flightNumber}</strong><br />
+                                    {path.flight.origin} → {path.flight.destination}<br />
+                                    {path.flight.start?.date}
+                                </Popup>
+                            </Polyline>
+                        ))}
+                    </React.Fragment>
+                ))}
+
+                {uniqueAirports.map(([code, coord]) => (
+                    <Marker
+                        key={code}
+                        position={coord}
+                        icon={L.divIcon({
+                            className: 'custom-marker',
+                            html: `<div style="background-color: var(--color-primary); width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid white; box-shadow: 0 0 3px rgba(0,0,0,0.4);"></div>`,
+                            iconSize: [6, 6],
+                            iconAnchor: [3, 3]
+                        })}
+                    >
+                        <Popup>
+                            <strong>Airport: {code}</strong>
+                        </Popup>
+                    </Marker>
+                ))}
+
+                {bounds && <SetBounds bounds={bounds} />}
+            </MapContainer>
+        </div>
+    );
+};
+
+export default FlightMap;
